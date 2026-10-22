@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caderno de Questões — Preparação Fatec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<header class="topo">
+  <a class="marca" href="#" data-tela="home">
+    <span class="marca-nome">Caderno de Questões</span>
+    <span class="marca-sub">Preparação Fatec · 2026</span>
+  </a>
+  <nav class="menu">
+    <button class="menu-item" data-tela="home">Início</button>
+    <button class="menu-item" data-tela="historico">Histórico</button>
+    <button class="menu-item" data-tela="banco">Banco de questões</button>
+    <button class="menu-item" id="btn-tema">Modo escuro</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ===== início ===== -->
+  <section id="tela-home" class="tela ativa">
+    <div class="abertura">
+      <p class="rotulo">Banco de questões</p>
+      <h2>Prepare-se para a Fatec, uma prova por vez.</h2>
+      <p class="texto-medio">Cada resposta é salva na hora. Dá para fechar e voltar depois — inclusive na semana que vem.</p>
+      <div class="acoes">
+        <button class="btn" id="btn-geral">Nova prova geral</button>
+        <button class="btn-secundario" id="btn-materia">Praticar por matéria</button>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <h3>Provas em andamento</h3>
+      <div id="lista-andamento"></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Levar para outro aparelho</h3>
+      <p class="texto-medio">Baixe um arquivo com seu progresso e o banco de questões. Ao restaurar nada é apagado: o que já existia é preservado e o novo é somado.</p>
+      <div class="acoes">
+        <button class="btn-secundario" id="btn-exportar">Baixar progresso (.json)</button>
+        <button class="btn-secundario" id="btn-importar">Restaurar progresso</button>
+        <input type="file" id="arquivo-importar" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== nova prova ===== -->
+  <section id="tela-nova" class="tela">
+    <p class="rotulo">Configurar</p>
+    <h2>Nova prova</h2>
+    <form id="form-nova">
+      <fieldset>
+        <legend>Tipo de prova</legend>
+        <label class="opcao-modo">
+          <input type="radio" name="modo" value="geral" checked>
+          <span><strong>Prova geral</strong> — mistura questões de todas as matérias.</span>
+        </label>
+        <label class="opcao-modo">
+          <input type="radio" name="modo" value="materia">
+          <span><strong>Praticar uma matéria</strong> — questões só da matéria escolhida.</span>
+        </label>
+      </fieldset>
+
+      <fieldset id="campos-materia" hidden>
+        <legend>Matéria</legend>
+        <label>Matéria da prova
+          <select id="materia-selecionada"></select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Quantidade</legend>
+        <label>Quantas questões?
+          <select id="quantidade">
+            <option value="5">5 questões</option>
+            <option value="10" selected>10 questões</option>
+            <option value="15">15 questões</option>
+            <option value="20">20 questões</option>
+            <option value="25">25 questões</option>
+            <option value="30">30 questões</option>
+            <option value="40">40 questões</option>
+            <option value="50">50 questões</option>
+            <option value="todas">Todas as disponíveis</option>
+          </select>
+        </label>
+        <label class="linha-check"><input type="checkbox" id="embaralhar" checked> Embaralhar a ordem das questões</label>
+      </fieldset>
+
+      <div class="acoes">
+        <button class="btn" type="submit">Começar prova</button>
+        <button class="btn-secundario" type="button" data-tela="home">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===== prova ===== -->
+  <section id="tela-prova" class="tela">
+    <div class="barra-prova">
+      <div>
+        <p class="rotulo" id="prova-modo">Prova geral</p>
+        <p class="contador" id="prova-contador">Questão 1 de 10</p>
+      </div>
+      <div class="acoes">
+        <button class="btn-secundario" id="btn-finalizar">Finalizar prova</button>
+      </div>
+    </div>
+
+    <article class="cartao questao">
+      <div class="questao-cabeca">
+        <span class="numero" id="questao-numero">01</span>
+        <div class="materias" id="questao-materia"></div>
+      </div>
+      <p class="enunciado" id="questao-enunciado"></p>
+      <div class="alternativas" id="questao-alternativas"></div>
+    </article>
+
+    <div class="navegacao">
+      <button class="btn-secundario" id="btn-anterior">← Anterior</button>
+      <div class="quadro" id="prova-quadro"></div>
+      <button class="btn" id="btn-proxima">Próxima →</button>
+    </div>
+  </section>
+
+  <!-- ===== resultado ===== -->
+  <section id="tela-resultado" class="tela">
+    <div class="cartao resultado-topo">
+      <div>
+        <p class="rotulo">Resultado</p>
+        <h2 id="resultado-titulo">Prova geral</h2>
+        <p class="texto-medio" id="resultado-meta"></p>
+        <div class="acoes">
+          <button class="btn" id="btn-nova-depois">Fazer outra prova</button>
+          <button class="btn-secundario" data-tela="home">Início</button>
+        </div>
+      </div>
+      <div class="carimbo"><span id="resultado-nota">0/0</span><small>acertos</small></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Resumo por matéria</h3>
+      <div id="resultado-por-materia"></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Correção</h3>
+      <div id="resultado-correcao"></div>
+    </div>
+  </section>
+
+  <!-- ===== histórico ===== -->
+  <section id="tela-historico" class="tela">
+    <p class="rotulo">Desempenho</p>
+    <h2>Histórico</h2>
+    <div id="lista-historico"></div>
+  </section>
+
+  <!-- ===== banco ===== -->
+  <section id="tela-banco" class="tela">
+    <p class="rotulo">Questões</p>
+    <h2>Banco de questões</h2>
+
+    <div class="bloco">
+      <h3>Resumo</h3>
+      <div id="banco-resumo" class="materias"></div>
+    </div>
+
+    <div class="bloco">
+      <h3>Adicionar questão</h3>
+      <form id="form-questao">
+        <label>Enunciado
+          <textarea id="nova-enunciado" rows="3"></textarea>
+        </label>
+        <label>Alternativas</label>
+        <input class="alt-input" type="text" placeholder="A — primeira alternativa">
+        <input class="alt-input" type="text" placeholder="B — segunda alternativa">
+        <input class="alt-input" type="text" placeholder="C — terceira alternativa">
+        <input class="alt-input" type="text" placeholder="D — quarta alternativa">
+        <input class="alt-input" type="text" placeholder="E — quinta alternativa">
+        <div class="grade-campos">
+          <label>Resposta correta
+            <select id="nova-correta">
+              <option value="0">A</option>
+              <option value="1">B</option>
+              <option value="2">C</option>
+              <option value="3">D</option>
+              <option value="4">E</option>
+            </select>
+          </label>
+          <label>Matéria
+            <select id="nova-materia"></select>
+          </label>
+        </div>
+        <label>Explicação (opcional, aparece na correção)
+          <input type="text" id="nova-explicacao">
+        </label>
+        <div class="acoes">
+          <button class="btn" type="submit">Adicionar ao banco</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bloco">
+      <h3>Questões cadastradas</h3>
+      <div id="lista-questoes"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== janela de JSON ===== -->
+<div class="modal" id="modal-json" hidden>
+  <div class="modal-caixa">
+    <p class="rotulo">JSON da questão</p>
+    <h3>Pronto para colar</h3>
+    <p class="texto-medio">Copie e cole dentro dos colchetes de <code>BANCO_PADRAO</code>, no arquivo <code>questoes.js</code> (logo depois da última questão, com vírgula). Se essa questão já existir lá, troque o <code>id</code> por um número livre (ex.: <code>q027</code>).</p>
+    <pre id="json-conteudo"></pre>
+    <div class="acoes">
+      <button class="btn" id="btn-copiar-json">Copiar JSON</button>
+      <button class="btn-secundario" id="btn-fechar-json">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="salvo">progresso salvo ✓</div>
+
+<script src="questoes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
