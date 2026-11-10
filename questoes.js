@@ -4110,14 +4110,14 @@ const BANCO_PADRAO = [
     "enunciado": "Uma urna contém 3 bolas vermelhas e 2 azuis. Duas bolas são retiradas sucessivamente, sem reposição. Sabendo que pelo menos uma das bolas retiradas é vermelha, qual é a probabilidade de ambas serem vermelhas?",
     "alternativas": [
       "1/5",
-      "1/10",
+      "1/3",
       "2/5",
-      "3/10",
+      "1/2",
       "3/4"
     ],
     "correta": 1,
     "materia": "Lógica",
-    "explicacao": "Existem 10 pares possíveis de bolas. Um par é formado pelas duas azuis, portanto 9 pares satisfazem a condição de haver pelo menos uma vermelha. Há 3 pares formados por duas vermelhas. A probabilidade condicional é 3/9 = 1/3."
+    "explicacao": "Existem C(5,2) = 10 pares possíveis. Um deles é formado pelas duas bolas azuis, portanto restam 9 pares com pelo menos uma vermelha. Existem C(3,2) = 3 pares com duas vermelhas. A probabilidade é 3/9 = 1/3."
   },
   {
     "id": "q352",
@@ -4193,11 +4193,11 @@ const BANCO_PADRAO = [
     "id": "q357",
     "enunciado": "Um baralho convencional possui 52 cartas, sendo 12 cartas de figuras: valetes, damas e reis. Uma carta é retirada ao acaso. Sabendo que ela é uma carta de figura, qual é a probabilidade de ser um rei?",
     "alternativas": [
-      "1/13",
-      "1/4",
+      "1/12",
+      "1/6",
       "1/3",
-      "1/4",
-      "4/13"
+      "1/2",
+      "2/3"
     ],
     "correta": 2,
     "materia": "Lógica",
