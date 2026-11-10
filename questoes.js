@@ -4198,5 +4198,286 @@ const BANCO_PADRAO = [
     correta: 3,
     materia: "Literatura",
     explicacao: "A memória subjetiva pode selecionar, reinterpretar ou omitir acontecimentos. Esse recurso permite explorar a perspectiva da personagem e torna relevante distinguir lembrança, percepção e fato narrado na análise literária."
+  },
+  {
+    id: "q301",
+    enunciado: "Uma loja vende um produto por R$ 200,00 e oferece um desconto de 15%. Qual será o preço final do produto?",
+    alternativas: [
+      "R$ 160,00",
+      "R$ 170,00",
+      "R$ 175,00",
+      "R$ 180,00",
+      "R$ 185,00"
+    ],
+    correta: 1,
+    materia: "Matemática — Porcentagem",
+    explicacao: "15% de 200 = 30. Subtraindo o desconto: 200 - 30 = R$ 170,00."
+  },
+  {
+    id: "q302",
+    enunciado: "Uma empresa possui 200 funcionários. Sabendo que 3/4 deles trabalham no período diurno, quantos funcionários trabalham nesse período?",
+    alternativas: [
+      "100",
+      "125",
+      "140",
+      "150",
+      "175"
+    ],
+    correta: 3,
+    materia: "Matemática — Frações",
+    explicacao: "Para calcular 3/4 de 200, dividimos 200 por 4 e multiplicamos por 3: 50 × 3 = 150 funcionários."
+  },
+  {
+    id: "q303",
+    enunciado: "Uma receita utiliza farinha e açúcar na proporção de 2 para 3. Se forem utilizados 40 kg dessa mistura, quantos quilos serão de farinha e quantos serão de açúcar, respectivamente?",
+    alternativas: [
+      "10 kg e 30 kg",
+      "12 kg e 28 kg",
+      "16 kg e 24 kg",
+      "20 kg e 20 kg",
+      "24 kg e 16 kg"
+    ],
+    correta: 2,
+    materia: "Matemática — Razão e Proporção",
+    explicacao: "A proporção possui 2 + 3 = 5 partes. Cada parte corresponde a 40/5 = 8 kg. Portanto, farinha: 2 × 8 = 16 kg; açúcar: 3 × 8 = 24 kg."
+  },
+  {
+    id: "q304",
+    enunciado: "Se 6 funcionários conseguem realizar determinado serviço em 8 dias, em quantos dias 12 funcionários, trabalhando no mesmo ritmo, realizarão o mesmo serviço?",
+    alternativas: [
+      "2 dias",
+      "3 dias",
+      "4 dias",
+      "6 dias",
+      "16 dias"
+    ],
+    correta: 2,
+    materia: "Matemática — Regra de Três",
+    explicacao: "A quantidade de funcionários e o tempo são inversamente proporcionais. Dobrar os funcionários reduz o tempo pela metade: 8/2 = 4 dias."
+  },
+  {
+    id: "q305",
+    enunciado: "Um aluno obteve as seguintes notas: Matemática 12, Português 15 e História 18. Sabendo que a média das quatro notas foi 17, qual foi sua nota em Geografia?",
+    alternativas: [
+      "20",
+      "21",
+      "22",
+      "23",
+      "24"
+    ],
+    correta: 3,
+    materia: "Matemática — Média Aritmética",
+    explicacao: "A soma das quatro notas deve ser 17 × 4 = 68. As três primeiras somam 12 + 15 + 18 = 45. Portanto, a nota de Geografia foi 68 - 45 = 23."
+  },
+  {
+    id: "q306",
+    enunciado: "Resolva a equação do primeiro grau: 3x - 7 = 2x + 9.",
+    alternativas: [
+      "x = 14",
+      "x = 15",
+      "x = 16",
+      "x = 17",
+      "x = 18"
+    ],
+    correta: 2,
+    materia: "Matemática — Equação do Primeiro Grau",
+    explicacao: "Subtraindo 2x dos dois lados, temos x - 7 = 9. Somando 7 aos dois lados, obtemos x = 16."
+  },
+  {
+    id: "q307",
+    enunciado: "A soma de dois números é 30 e a diferença entre eles é 6. Quais são esses dois números, considerando o maior primeiro?",
+    alternativas: [
+      "16 e 14",
+      "18 e 12",
+      "20 e 10",
+      "21 e 9",
+      "24 e 6"
+    ],
+    correta: 1,
+    materia: "Matemática — Sistema de Equações",
+    explicacao: "Chamando os números de x e y, temos x + y = 30 e x - y = 6. Somando as equações, 2x = 36, então x = 18. Consequentemente, y = 12."
+  },
+  {
+    id: "q308",
+    enunciado: "Observe a sequência numérica: 3, 7, 15, 31, 63, ?. Qual é o próximo número?",
+    alternativas: [
+      "95",
+      "111",
+      "119",
+      "125",
+      "127"
+    ],
+    correta: 4,
+    materia: "Matemática — Sequências Numéricas",
+    explicacao: "Cada número é obtido multiplicando o anterior por 2 e somando 1. Assim: 63 × 2 + 1 = 127."
+  },
+  {
+    id: "q309",
+    enunciado: "Um terreno retangular possui 12 metros de comprimento e 7 metros de largura. Qual é sua área total?",
+    alternativas: [
+      "38 m²",
+      "72 m²",
+      "84 m²",
+      "96 m²",
+      "168 m²"
+    ],
+    correta: 2,
+    materia: "Matemática — Geometria Plana",
+    explicacao: "A área de um retângulo é calculada multiplicando comprimento pela largura: 12 × 7 = 84 m²."
+  },
+  {
+    id: "q310",
+    enunciado: "Uma escada está apoiada em uma parede. Sua base está a 6 metros da parede e seu topo alcança 8 metros de altura. Qual é o comprimento da escada?",
+    alternativas: [
+      "8 metros",
+      "9 metros",
+      "10 metros",
+      "12 metros",
+      "14 metros"
+    ],
+    correta: 2,
+    materia: "Matemática — Teorema de Pitágoras",
+    explicacao: "A escada representa a hipotenusa de um triângulo retângulo. Aplicando Pitágoras: h² = 6² + 8² = 36 + 64 = 100. Portanto, h = 10 metros."
+  },
+  {
+    id: "q311",
+    enunciado: "Um veículo percorre 180 km em 2 horas e 30 minutos, mantendo velocidade média constante. Qual foi sua velocidade média em km/h?",
+    alternativas: [
+      "60 km/h",
+      "65 km/h",
+      "70 km/h",
+      "72 km/h",
+      "75 km/h"
+    ],
+    correta: 3,
+    materia: "Matemática — Velocidade Média",
+    explicacao: "2 horas e 30 minutos correspondem a 2,5 horas. A velocidade média é distância dividida pelo tempo: 180/2,5 = 72 km/h."
+  },
+  {
+    id: "q312",
+    enunciado: "Um funcionário recebe R$ 2.000,00 de salário. Primeiro, recebe um aumento de 10%. Depois, sofre uma redução de 10% sobre o novo salário. Qual será seu salário final?",
+    alternativas: [
+      "R$ 1.800,00",
+      "R$ 1.900,00",
+      "R$ 1.980,00",
+      "R$ 2.000,00",
+      "R$ 2.020,00"
+    ],
+    correta: 2,
+    materia: "Matemática — Porcentagem Sucessiva",
+    explicacao: "O aumento de 10% transforma R$ 2.000,00 em R$ 2.200,00. A redução de 10% sobre R$ 2.200,00 corresponde a R$ 220,00. Portanto, 2.200 - 220 = R$ 1.980,00. Os percentuais não se anulam porque são aplicados sobre valores diferentes."
+  },
+  {
+    id: "q313",
+    enunciado: "Uma torneira consegue encher um reservatório em 6 horas. Outra torneira consegue encher o mesmo reservatório em 3 horas. Se ambas forem abertas simultaneamente, quanto tempo levarão para encher o reservatório?",
+    alternativas: [
+      "1 hora",
+      "1 hora e 30 minutos",
+      "2 horas",
+      "3 horas",
+      "4 horas"
+    ],
+    correta: 2,
+    materia: "Matemática — Trabalho Conjunto",
+    explicacao: "A primeira torneira enche 1/6 do reservatório por hora e a segunda enche 1/3. Juntas, enchem 1/6 + 1/3 = 1/2 do reservatório por hora. Portanto, levam 2 horas."
+  },
+  {
+    id: "q314",
+    enunciado: "Dois dados comuns de seis faces são lançados simultaneamente. Qual é a probabilidade de a soma dos resultados ser igual a 8?",
+    alternativas: [
+      "1/6",
+      "5/36",
+      "1/4",
+      "7/36",
+      "1/3"
+    ],
+    correta: 1,
+    materia: "Matemática — Probabilidade",
+    explicacao: "Existem 6 × 6 = 36 resultados possíveis. As combinações que resultam em 8 são: (2,6), (3,5), (4,4), (5,3) e (6,2). São 5 casos favoráveis em 36 possíveis. Portanto, a probabilidade é 5/36."
+  },
+  {
+    id: "q315",
+    enunciado: "Uma equipe possui 8 funcionários e precisa escolher 3 deles para formar uma comissão. Quantas comissões diferentes podem ser formadas, considerando que a ordem de escolha não importa?",
+    alternativas: [
+      "24",
+      "48",
+      "56",
+      "64",
+      "336"
+    ],
+    correta: 2,
+    materia: "Matemática — Análise Combinatória",
+    explicacao: "Como a ordem não importa, utilizamos combinação: C(8,3) = 8!/(3! × 5!) = (8 × 7 × 6)/(3 × 2 × 1) = 56 comissões."
+  },
+  {
+    id: "q316",
+    enunciado: "Uma pessoa investiu R$ 1.500,00 a uma taxa de juros simples de 2% ao mês durante 5 meses. Qual será o valor dos juros recebidos?",
+    alternativas: [
+      "R$ 100,00",
+      "R$ 120,00",
+      "R$ 150,00",
+      "R$ 180,00",
+      "R$ 200,00"
+    ],
+    correta: 2,
+    materia: "Matemática — Juros Simples",
+    explicacao: "Nos juros simples, utilizamos J = C × i × t. Substituindo: J = 1.500 × 0,02 × 5 = R$ 150,00."
+  },
+  {
+    id: "q317",
+    enunciado: "Um capital de R$ 1.000,00 foi aplicado a uma taxa de juros compostos de 10% por período. Qual será o montante após 2 períodos?",
+    alternativas: [
+      "R$ 1.100,00",
+      "R$ 1.200,00",
+      "R$ 1.210,00",
+      "R$ 1.220,00",
+      "R$ 1.250,00"
+    ],
+    correta: 2,
+    materia: "Matemática — Juros Compostos",
+    explicacao: "Nos juros compostos, os juros são incorporados ao capital a cada período. No primeiro período: 1.000 × 1,10 = 1.100. No segundo: 1.100 × 1,10 = R$ 1.210,00."
+  },
+  {
+    id: "q318",
+    enunciado: "Um recipiente contém 20 litros de uma solução com concentração de 30% de determinada substância. São adicionados 10 litros de água pura. Qual será a nova concentração percentual da substância?",
+    alternativas: [
+      "10%",
+      "15%",
+      "20%",
+      "25%",
+      "30%"
+    ],
+    correta: 2,
+    materia: "Matemática — Razão e Porcentagem",
+    explicacao: "A quantidade da substância inicialmente é 20 × 0,30 = 6 litros. Com a adição de 10 litros de água, o volume total passa a ser 30 litros. A nova concentração é 6/30 × 100 = 20%."
+  },
+  {
+    id: "q319",
+    enunciado: "Em uma pesquisa com 120 motoristas, 70 utilizam o aplicativo A, 55 utilizam o aplicativo B e 20 utilizam ambos os aplicativos. Quantos motoristas não utilizam nenhum dos dois aplicativos?",
+    alternativas: [
+      "5",
+      "10",
+      "15",
+      "20",
+      "25"
+    ],
+    correta: 2,
+    materia: "Matemática — Teoria dos Conjuntos",
+    explicacao: "Pelo princípio da inclusão e exclusão, o total que utiliza pelo menos um aplicativo é 70 + 55 - 20 = 105. Portanto, 120 - 105 = 15 motoristas não utilizam nenhum dos dois."
+  },
+  {
+    id: "q320",
+    enunciado: "Um motorista percorre um trajeto de 120 km. Nos primeiros 60 km, mantém velocidade média de 60 km/h. Nos últimos 60 km, mantém velocidade média de 90 km/h. Qual é a velocidade média de todo o percurso?",
+    alternativas: [
+      "60 km/h",
+      "65 km/h",
+      "70 km/h",
+      "72 km/h",
+      "75 km/h"
+    ],
+    correta: 3,
+    materia: "Matemática — Velocidade Média",
+    explicacao: "Nos primeiros 60 km, o motorista gasta 1 hora. Nos últimos 60 km, gasta 60/90 = 2/3 de hora. O tempo total é 5/3 de hora. A velocidade média é 120 ÷ (5/3) = 72 km/h. Não se deve calcular a média aritmética das duas velocidades, pois os tempos de percurso são diferentes."
   }
+
 ];
