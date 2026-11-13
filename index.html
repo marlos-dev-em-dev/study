@@ -124,6 +124,98 @@
       <div class="alternativas" id="questao-alternativas"></div>
     </article>
 
+        <!-- ===== rascunho ===== -->
+    <div class="rascunho-wrap">
+      <div class="rascunho-barra">
+        <button class="btn-secundario btn-pequeno" id="btn-rascunho" aria-expanded="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+          Rascunho
+        </button>
+        <span class="rascunho-indicador" id="rascunho-indicador" hidden>rascunho salvo</span>
+      </div>
+      <div class="rascunho-painel" id="rascunho-painel" hidden>
+        <div class="ferramentas">
+          <div class="ferr-grupo">
+            <button class="ferr-cor ativa" data-cor="#2b2b2b" style="--c:#2b2b2b" title="Preto"></button>
+            <button class="ferr-cor" data-cor="#c0392b" style="--c:#c0392b" title="Vermelho"></button>
+            <button class="ferr-cor" data-cor="#2471a3" style="--c:#2471a3" title="Azul"></button>
+            <button class="ferr-cor" data-cor="#1e8449" style="--c:#1e8449" title="Verde"></button>
+            <button class="ferr-cor" data-cor="#d35400" style="--c:#d35400" title="Laranja"></button>
+          </div>
+          <div class="ferr-divisor"></div>
+          <div class="ferr-grupo">
+            <button class="ferr-tamanho" data-esp="1.5" title="Fino"><span class="ponto" style="width:4px;height:4px"></span></button>
+            <button class="ferr-tamanho ativa" data-esp="3" title="Medio"><span class="ponto" style="width:8px;height:8px"></span></button>
+            <button class="ferr-tamanho" data-esp="6" title="Grosso"><span class="ponto" style="width:13px;height:13px"></span></button>
+          </div>
+          <div class="ferr-divisor"></div>
+          <div class="ferr-grupo">
+            <button class="ferr-texto ativa" data-ferramenta="lapis">Lápis</button>
+            <button class="ferr-texto" data-ferramenta="borracha">Borracha</button>
+          </div>
+          <div class="ferr-divisor"></div>
+          <div class="ferr-grupo">
+            <button class="ferr-texto" id="btn-desfazer">Desfazer</button>
+            <button class="ferr-texto" id="btn-limpar">Limpar</button>
+          </div>
+        </div>
+        <div class="rascunho-area">
+          <canvas id="rascunho-canvas" width="900" height="600"></canvas>
+        </div>
+        <p class="rascunho-dica texto-medio">Cada questão tem seu próprio rascunho, salvo automaticamente junto com a prova.</p>
+      </div>
+    </div>
+
+        <!-- ===== calculadora ===== -->
+    <div class="calc-wrap">
+      <div class="calc-barra">
+        <button class="btn-secundario btn-pequeno" id="btn-calc" aria-expanded="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="18"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+          Calculadora
+        </button>
+        <button class="btn-secundario btn-pequeno" id="calc-fixar" title="Fixar sobre a prova">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><rect x="12" y="13" width="8" height="6" rx="1"/></svg>
+          Fixar
+        </button>
+      </div>
+      <div class="calc-painel" id="calc-painel" hidden>
+                <div class="calc-topo">
+          <span class="calc-marca">Calculadora</span>
+          <div class="calc-topo-acoes">
+            <button class="calc-icone-btn" id="calc-voltar" title="Voltar para dentro da prova">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><rect x="6" y="8" width="12" height="10" rx="1"/></svg>
+            </button>
+            <button class="calc-icone-btn" id="calc-fechar" title="Fechar">×</button>
+          </div>
+        </div>
+        <div class="calc-tela">
+          <div class="calc-sub" id="calc-sub"></div>
+          <div class="calc-display" id="calc-display">0</div>
+        </div>
+        <div class="calc-teclado" id="calc-teclado">
+          <button type="button" class="calc-tecla util" data-acao="limpar">C</button>
+          <button type="button" class="calc-tecla util" data-acao="apagar">←</button>
+          <button type="button" class="calc-tecla op" data-op="/">÷</button>
+          <button type="button" class="calc-tecla op" data-op="*">×</button>
+          <button type="button" class="calc-tecla num" data-num="7">7</button>
+          <button type="button" class="calc-tecla num" data-num="8">8</button>
+          <button type="button" class="calc-tecla num" data-num="9">9</button>
+          <button type="button" class="calc-tecla op" data-op="-">−</button>
+          <button type="button" class="calc-tecla num" data-num="4">4</button>
+          <button type="button" class="calc-tecla num" data-num="5">5</button>
+          <button type="button" class="calc-tecla num" data-num="6">6</button>
+          <button type="button" class="calc-tecla op" data-op="+">+</button>
+          <button type="button" class="calc-tecla num" data-num="1">1</button>
+          <button type="button" class="calc-tecla num" data-num="2">2</button>
+          <button type="button" class="calc-tecla num" data-num="3">3</button>
+          <button type="button" class="calc-tecla op igual" data-acao="igual">=</button>
+          <button type="button" class="calc-tecla num zero" data-num="0">0</button>
+          <button type="button" class="calc-tecla num" data-acao="virgula">,</button>
+        </div>
+        <p class="calc-dica texto-medio">Teclado: 0–9 · + − × ÷ · Enter (=) · Backspace apaga · C limpa. Com a calculadora aberta, os números vão para ela.</p>
+      </div>
+    </div>
+
     <div class="navegacao">
       <button class="btn-secundario" id="btn-anterior">← Anterior</button>
       <div class="quadro" id="prova-quadro"></div>

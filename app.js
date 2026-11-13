@@ -178,6 +178,7 @@ function criarSessao(config) {
     materia: config.materia || null,
     ordem: escolhidas.map(function (q) { return q.id; }),
     respostas: {},
+    rascunhos: {},
     atual: 0,
     status: "em_andamento"
   };
@@ -298,6 +299,7 @@ function renderizarProva() {
 
   document.getElementById("btn-anterior").disabled = s.atual === 0;
   document.getElementById("btn-proxima").disabled = s.atual >= s.ordem.length - 1;
+  carregarRascunho();
 }
 
 function renderizarResultado(s) {
@@ -612,5 +614,611 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "Escape") fecharJson();
   });
 
+  initRascunho();
+  initCalculadora();
+  initAtalhos();
   mostrar("home");
 });
+
+/* =========================================================
+   RASCUNHO — área de desenho por questão (paint)
+   Cada traço é salvo como vetor em sessao.rascunhos[qid].
+   Traço = { tipo, cor, esp, pontos: [[x,y], ...] }
+   ========================================================= */
+
+const RASCUNHO = {
+  canvas: null,
+  ctx: null,
+  cor: "#2b2b2b",
+  esp: 3,
+  ferramenta: "lapis",
+  desenhando: false,
+  tracoAtual: null
+};
+
+function rascunhoQid() {
+  const s = sessao();
+  return s ? s.ordem[s.atual] : null;
+}
+
+function rascunhoTracos() {
+  const s = sessao();
+  const qid = rascunhoQid();
+  if (!s || !qid) return null;
+  if (!s.rascunhos) s.rascunhos = {};
+  if (!s.rascunhos[qid]) s.rascunhos[qid] = [];
+  return s.rascunhos[qid];
+}
+
+function pontoRascunho(ev) {
+  const r = RASCUNHO.canvas.getBoundingClientRect();
+  return [
+    Math.round((ev.clientX - r.left) * (RASCUNHO.canvas.width / r.width)),
+    Math.round((ev.clientY - r.top) * (RASCUNHO.canvas.height / r.height))
+  ];
+}
+
+function prepararPincel(ctx, traco) {
+  if (traco.tipo === "borracha") {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.strokeStyle = "rgba(0,0,0,1)";
+    ctx.fillStyle = "rgba(0,0,0,1)";
+  } else {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = traco.cor;
+    ctx.fillStyle = traco.cor;
+  }
+  ctx.lineWidth = traco.esp;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+}
+
+function onRascunhoDown(ev) {
+  const tracos = rascunhoTracos();
+  if (!tracos || !RASCUNHO.ctx) return;
+  ev.preventDefault();
+  RASCUNHO.desenhando = true;
+  try { RASCUNHO.canvas.setPointerCapture(ev.pointerId); } catch (e) { }
+
+  const esp = RASCUNHO.ferramenta === "borracha" ? RASCUNHO.esp * 3 : RASCUNHO.esp;
+  const p = pontoRascunho(ev);
+  RASCUNHO.tracoAtual = {
+    tipo: RASCUNHO.ferramenta,
+    cor: RASCUNHO.cor,
+    esp: esp,
+    pontos: [p]
+  };
+
+  const ctx = RASCUNHO.ctx;
+  prepararPincel(ctx, RASCUNHO.tracoAtual);
+  ctx.beginPath();
+  ctx.arc(p[0], p[1], esp / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function onRascunhoMove(ev) {
+  if (!RASCUNHO.desenhando || !RASCUNHO.tracoAtual) return;
+  const p = pontoRascunho(ev);
+  const pts = RASCUNHO.tracoAtual.pontos;
+  const ultimo = pts[pts.length - 1];
+  const dx = p[0] - ultimo[0];
+  const dy = p[1] - ultimo[1];
+  if (dx * dx + dy * dy < 4) return;
+
+  pts.push(p);
+  const ctx = RASCUNHO.ctx;
+  prepararPincel(ctx, RASCUNHO.tracoAtual);
+  ctx.beginPath();
+  ctx.moveTo(ultimo[0], ultimo[1]);
+  ctx.lineTo(p[0], p[1]);
+  ctx.stroke();
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function onRascunhoUp() {
+  if (!RASCUNHO.desenhando) return;
+  RASCUNHO.desenhando = false;
+  if (RASCUNHO.tracoAtual && RASCUNHO.tracoAtual.pontos.length > 0) {
+    const tracos = rascunhoTracos();
+    if (tracos) {
+      tracos.push(RASCUNHO.tracoAtual);
+      try { salvar(); } catch (e) { mostrarSalvo("não consegui salvar o rascunho"); }
+      atualizarIndicadorRascunho();
+    }
+  }
+  RASCUNHO.tracoAtual = null;
+}
+
+function desenharTraco(ctx, traco) {
+  if (!traco.pontos || traco.pontos.length === 0) return;
+  prepararPincel(ctx, traco);
+  if (traco.pontos.length === 1) {
+    const p = traco.pontos[0];
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], traco.esp / 2, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(traco.pontos[0][0], traco.pontos[0][1]);
+    for (let i = 1; i < traco.pontos.length; i++) {
+      ctx.lineTo(traco.pontos[i][0], traco.pontos[i][1]);
+    }
+    ctx.stroke();
+  }
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function carregarRascunho() {
+  const canvas = RASCUNHO.canvas;
+  if (!canvas || !RASCUNHO.ctx) return;
+  const ctx = RASCUNHO.ctx;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = "source-over";
+  const tracos = rascunhoTracos() || [];
+  for (const traco of tracos) desenharTraco(ctx, traco);
+  atualizarIndicadorRascunho();
+}
+
+function atualizarIndicadorRascunho() {
+  const ind = document.getElementById("rascunho-indicador");
+  if (!ind) return;
+  const tracos = rascunhoTracos() || [];
+  ind.hidden = tracos.length === 0;
+}
+
+function desfazerRascunho() {
+  const tracos = rascunhoTracos();
+  if (!tracos || tracos.length === 0) return;
+  tracos.pop();
+  salvar();
+  carregarRascunho();
+}
+
+function limparRascunho() {
+  const tracos = rascunhoTracos();
+  if (!tracos || tracos.length === 0) return;
+  if (!confirm("Limpar todo o rascunho desta questão?")) return;
+  tracos.length = 0;
+  salvar();
+  carregarRascunho();
+}
+
+function atualizarFerramentas() {
+  document.querySelectorAll(".ferr-cor").forEach(function (btn) {
+    btn.classList.toggle("ativa",
+      btn.dataset.cor === RASCUNHO.cor && RASCUNHO.ferramenta === "lapis");
+  });
+  document.querySelectorAll(".ferr-tamanho").forEach(function (btn) {
+    btn.classList.toggle("ativa", parseFloat(btn.dataset.esp) === RASCUNHO.esp);
+  });
+  document.querySelectorAll("[data-ferramenta]").forEach(function (btn) {
+    btn.classList.toggle("ativa", btn.dataset.ferramenta === RASCUNHO.ferramenta);
+  });
+}
+
+function initRascunho() {
+  const canvas = document.getElementById("rascunho-canvas");
+  const painel = document.getElementById("rascunho-painel");
+  const btnToggle = document.getElementById("btn-rascunho");
+
+  if (!canvas || !painel || !btnToggle) {
+    console.warn("[rascunho] Elementos não encontrados. Confira se o bloco HTML do rascunho está dentro da tela-prova, com os ids: btn-rascunho, rascunho-painel, rascunho-canvas.");
+    return;
+  }
+
+  if (!canvas.width) canvas.width = 900;
+  if (!canvas.height) canvas.height = 600;
+  RASCUNHO.canvas = canvas;
+  RASCUNHO.ctx = canvas.getContext ? canvas.getContext("2d") : null;
+  if (!RASCUNHO.ctx) {
+    console.warn("[rascunho] Não consegui o contexto 2D do canvas.");
+    return;
+  }
+
+  canvas.addEventListener("pointerdown", onRascunhoDown);
+  canvas.addEventListener("pointermove", onRascunhoMove);
+  document.addEventListener("pointerup", onRascunhoUp);
+  document.addEventListener("pointercancel", onRascunhoUp);
+
+  btnToggle.addEventListener("click", function () {
+    const aberto = painel.hidden;
+    painel.hidden = !aberto;
+    btnToggle.setAttribute("aria-expanded", String(aberto));
+    btnToggle.classList.toggle("ativa", aberto);
+    if (aberto) carregarRascunho();
+  });
+
+  document.querySelectorAll(".ferr-cor").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      RASCUNHO.cor = btn.dataset.cor;
+      RASCUNHO.ferramenta = "lapis";
+      atualizarFerramentas();
+    });
+  });
+
+  document.querySelectorAll(".ferr-tamanho").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      RASCUNHO.esp = parseFloat(btn.dataset.esp);
+      atualizarFerramentas();
+    });
+  });
+
+  document.querySelectorAll("[data-ferramenta]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      RASCUNHO.ferramenta = btn.dataset.ferramenta;
+      atualizarFerramentas();
+    });
+  });
+
+  const btnDesfazer = document.getElementById("btn-desfazer");
+  if (btnDesfazer) btnDesfazer.addEventListener("click", desfazerRascunho);
+
+  const btnLimpar = document.getElementById("btn-limpar");
+  if (btnLimpar) btnLimpar.addEventListener("click", limparRascunho);
+
+  atualizarFerramentas();
+}
+
+/* =========================================================
+   CALCULADORA SIMPLES — soma, subtração, multiplicação, divisão
+   ========================================================= */
+
+const CALC = {
+  atual: "0",
+  acc: null,
+  op: null,
+  novo: true
+};
+
+function calcFormatar(n) {
+  if (!isFinite(n)) return "erro";
+  const arred = parseFloat(n.toPrecision(12));
+  return String(arred).replace(".", ",");
+}
+
+function calcValor() {
+  return parseFloat(String(CALC.atual).replace(",", ".")) || 0;
+}
+
+function calcMostrar() {
+  const tela = document.getElementById("calc-display");
+  const sub = document.getElementById("calc-sub");
+  if (tela) tela.textContent = CALC.atual;
+  if (sub) {
+    const simbolo = { "+": "+", "-": "−", "*": "×", "/": "÷" }[CALC.op] || "";
+    sub.textContent = (CALC.acc !== null && CALC.op) ? calcFormatar(CALC.acc) + " " + simbolo : "";
+  }
+}
+
+function calcAplicar(a, b, op) {
+  if (op === "+") return a + b;
+  if (op === "-") return a - b;
+  if (op === "*") return a * b;
+  if (op === "/") return b === 0 ? null : a / b;
+  return b;
+}
+
+function calcDigito(d) {
+  if (CALC.atual === "erro") { CALC.atual = "0"; CALC.novo = true; }
+  if (CALC.novo) { CALC.atual = d; CALC.novo = false; return; }
+  if ((CALC.atual.match(/[0-9]/g) || []).length >= 12) return;
+  CALC.atual = (CALC.atual === "0") ? d : CALC.atual + d;
+}
+
+function calcVirgula() {
+  if (CALC.atual === "erro") { CALC.atual = "0"; CALC.novo = true; }
+  if (CALC.novo) { CALC.atual = "0,"; CALC.novo = false; return; }
+  if (CALC.atual.indexOf(",") === -1) CALC.atual += ",";
+}
+
+function calcOperador(op) {
+  if (CALC.atual === "erro") { calcLimpar(); return; }
+  if (CALC.op !== null && !CALC.novo) {
+    const res = calcAplicar(CALC.acc, calcValor(), CALC.op);
+    if (res === null) { CALC.atual = "erro"; CALC.acc = null; CALC.op = null; CALC.novo = true; return; }
+    CALC.acc = res;
+    CALC.atual = calcFormatar(res);
+  } else if (CALC.acc === null) {
+    CALC.acc = calcValor();
+  }
+  CALC.op = op;
+  CALC.novo = true;
+}
+
+function calcIgual() {
+  if (CALC.op === null || CALC.acc === null || CALC.atual === "erro") return;
+  const res = calcAplicar(CALC.acc, calcValor(), CALC.op);
+  CALC.atual = (res === null) ? "erro" : calcFormatar(res);
+  CALC.acc = null;
+  CALC.op = null;
+  CALC.novo = true;
+}
+
+function calcLimpar() {
+  CALC.atual = "0";
+  CALC.acc = null;
+  CALC.op = null;
+  CALC.novo = true;
+}
+
+function calcApagar() {
+  if (CALC.atual === "erro") { calcLimpar(); return; }
+  if (CALC.novo) return;
+  let t = CALC.atual.slice(0, -1);
+  if (t === "" || t === "-") t = "0";
+  CALC.atual = t;
+  if (t === "0") CALC.novo = true;
+}
+
+function calcBotao(b) {
+  if (b.dataset.num !== undefined) calcDigito(b.dataset.num);
+  else if (b.dataset.op) calcOperador(b.dataset.op);
+  else if (b.dataset.acao === "virgula") calcVirgula();
+  else if (b.dataset.acao === "limpar") calcLimpar();
+  else if (b.dataset.acao === "apagar") calcApagar();
+  else if (b.dataset.acao === "igual") calcIgual();
+  calcMostrar();
+}
+
+function teclaCalc(ev) {
+  const k = ev.key;
+  if (k.length === 1 && k >= "0" && k <= "9") { calcDigito(k); calcMostrar(); return true; }
+  if (k === "," || k === ".") { calcVirgula(); calcMostrar(); return true; }
+  if (k === "+" || k === "-" || k === "*" || k === "/" || k === "x" || k === "X") {
+    calcOperador(k === "x" || k === "X" ? "*" : k);
+    calcMostrar();
+    return true;
+  }
+  if (k === "Enter" || k === "=") { calcIgual(); calcMostrar(); return true; }
+  if (k === "Backspace") { calcApagar(); calcMostrar(); return true; }
+  if (k === "c" || k === "C") { calcLimpar(); calcMostrar(); return true; }
+  return false;
+}
+
+function initCalculadora() {
+  const painel = document.getElementById("calc-painel");
+  const btnToggle = document.getElementById("btn-calc");
+  const teclado = document.getElementById("calc-teclado");
+
+  if (!painel || !btnToggle || !teclado) {
+    console.warn("[calculadora] Elementos não encontrados. Confira se o bloco HTML da calculadora está dentro da tela-prova, com os ids: btn-calc, calc-painel, calc-teclado.");
+    return;
+  }
+
+  btnToggle.addEventListener("click", function () {
+    const aberto = painel.hidden;
+    painel.hidden = !aberto;
+    btnToggle.setAttribute("aria-expanded", String(aberto));
+    btnToggle.classList.toggle("ativa", aberto);
+    if (aberto) calcMostrar();
+  });
+
+  teclado.addEventListener("click", function (ev) {
+    const b = ev.target.closest(".calc-tecla");
+    if (!b) return;
+    calcBotao(b);
+  });
+
+  calcMostrar();
+}
+
+/* =========================================================
+   ATALHOS — funcionam sempre que a tela da prova está visível
+   1..5 = cores · L = lápis · B = borracha
+   Ctrl+Z = desfazer · Ctrl+Shift+L = limpar
+   (Ctrl+L não dá: o navegador usa para a barra de endereço)
+   Com a calculadora aberta, os números vão para a calculadora.
+   ========================================================= */
+
+function emCampoTexto(alvo) {
+  if (!alvo) return false;
+  const tag = (alvo.tagName || "").toLowerCase();
+  return tag === "input" || tag === "textarea" || tag === "select" || !!alvo.isContentEditable;
+}
+
+function initAtalhos() {
+  document.addEventListener("keydown", function (ev) {
+    if (emCampoTexto(ev.target)) return; // nunca atrapalhar digitação
+
+    const prova = document.getElementById("tela-prova");
+    if (!prova || !prova.classList.contains("ativa")) return; // só na tela da prova
+
+    const modal = document.getElementById("modal-json");
+    if (modal && !modal.hidden) return; // modal tem prioridade
+
+    const calcPainel = document.getElementById("calc-painel");
+    const calcAberto = !!(calcPainel && !calcPainel.hidden);
+
+    const ctrl = ev.ctrlKey || ev.metaKey;
+
+    // Ctrl+Z — desfazer traço
+    if (ctrl && !ev.shiftKey && !ev.altKey &&
+        (ev.code === "KeyZ" || ev.key === "z" || ev.key === "Z")) {
+      ev.preventDefault();
+      desfazerRascunho();
+      mostrarSalvo("desfeito ✓");
+      return;
+    }
+
+    // Ctrl+Shift+L — limpar rascunho
+    if (ctrl && ev.shiftKey && !ev.altKey &&
+        (ev.code === "KeyL" || ev.key === "l" || ev.key === "L")) {
+      ev.preventDefault();
+      limparRascunho();
+      return;
+    }
+
+    if (ctrl || ev.altKey) return;
+
+    // Escape — fecha a calculadora se estiver aberta
+    if (ev.key === "Escape") {
+      if (calcAberto) {
+        ev.preventDefault();
+        calcPainel.hidden = true;
+        const btnCalc = document.getElementById("btn-calc");
+        if (btnCalc) {
+          btnCalc.setAttribute("aria-expanded", "false");
+          btnCalc.classList.remove("ativa");
+        }
+      }
+      return;
+    }
+
+    // Com a calculadora aberta, números e operadores vão para ela
+    if (calcAberto) {
+      if (teclaCalc(ev)) {
+        ev.preventDefault();
+        return;
+      }
+    }
+
+    // 1..5 — cores do rascunho (só com a calculadora fechada)
+    let dig = null;
+    const m = /^Digit([1-5])$/.exec(ev.code || "");
+    if (m) dig = m[1];
+    else if (/^[1-5]$/.test(ev.key)) dig = ev.key;
+
+    if (dig && !calcAberto) {
+      const btn = document.querySelectorAll(".ferr-cor")[parseInt(dig, 10) - 1];
+      if (!btn) return;
+      ev.preventDefault();
+      RASCUNHO.cor = btn.dataset.cor;
+      RASCUNHO.ferramenta = "lapis";
+      atualizarFerramentas();
+      mostrarSalvo("cor: " + (btn.title || dig) + " ✓");
+      return;
+    }
+
+    // L — lápis · B — borracha
+    let k = null;
+    if (ev.code === "KeyL") k = "l";
+    else if (ev.code === "KeyB") k = "b";
+    else if (ev.key === "l" || ev.key === "L") k = "l";
+    else if (ev.key === "b" || ev.key === "B") k = "b";
+
+    if (k) {
+      ev.preventDefault();
+      RASCUNHO.ferramenta = k === "l" ? "lapis" : "borracha";
+      atualizarFerramentas();
+      mostrarSalvo(k === "l" ? "lápis ✓" : "borracha ✓");
+    }
+  });
+
+  // atualiza a linha de dica do rascunho
+  const dica = document.querySelector(".rascunho-dica");
+  if (dica) {
+    dica.textContent = "Atalhos: 1–5 cores · L lápis · B borracha · Ctrl+Z desfazer · Ctrl+Shift+L limpar. " +
+      "Cada questão guarda o próprio rascunho, salvo automaticamente.";
+  }
+}
+
+/* =========================================================
+   CALCULADORA — MODO FLUTUANTE (pop-out)
+   Só cuida de fixar / arrastar / fechar. Não mexe nos cálculos.
+   ========================================================= */
+
+(function () {
+  var painel = document.getElementById("calc-painel");
+  var btnCalc = document.getElementById("btn-calc");
+  var btnFixar = document.getElementById("calc-fixar");
+  var btnVoltar = document.getElementById("calc-voltar");
+  var btnFechar = document.getElementById("calc-fechar");
+  if (!painel || !btnFixar) return;
+
+  function flutuante() { return painel.classList.contains("flutuante"); }
+
+  function marcarAberto(aberto) {
+    if (btnCalc) btnCalc.setAttribute("aria-expanded", aberto ? "true" : "false");
+  }
+
+  function entrarFlutuante() {
+    painel.hidden = false;
+    marcarAberto(true);
+    painel.classList.add("flutuante");
+    if (!painel.style.left) {
+      painel.style.left = Math.max(0, window.innerWidth - (painel.offsetWidth || 300) - 24) + "px";
+      painel.style.top = "80px";
+    }
+    // garantir que está visível (memória de posição pode ter ficado fora da tela)
+    var maxX = window.innerWidth - painel.offsetWidth;
+    var maxY = window.innerHeight - painel.offsetHeight;
+    var x = parseFloat(painel.style.left) || 0;
+    var y = parseFloat(painel.style.top) || 0;
+    if (x > maxX || y > maxY) {
+      painel.style.left = Math.max(0, Math.min(x, maxX)) + "px";
+      painel.style.top = Math.max(0, Math.min(y, maxY)) + "px";
+    }
+    if (btnFixar) btnFixar.title = "Voltar para dentro da prova";
+  }
+
+  function sairFlutuante() {
+    painel.classList.remove("flutuante", "arrastando");
+    if (btnFixar) btnFixar.title = "Fixar sobre a prova";
+    // a posição fica guardada — ao flutuar de novo, volta pro mesmo lugar
+  }
+
+  function alternarFlutuante() {
+    if (painel.hidden) { entrarFlutuante(); return; }
+    if (flutuante()) sairFlutuante();
+    else entrarFlutuante();
+  }
+
+  function fecharTudo() {
+    sairFlutuante();
+    painel.hidden = true;
+    marcarAberto(false);
+  }
+
+  btnFixar.addEventListener("click", alternarFlutuante);
+  if (btnVoltar) btnVoltar.addEventListener("click", sairFlutuante);
+  if (btnFechar) btnFechar.addEventListener("click", fecharTudo);
+
+  /* --- arrastar pela barra do topo --- */
+
+  var drag = { ativo: false, dx: 0, dy: 0 };
+  var topo = painel.querySelector(".calc-topo");
+
+  if (topo) {
+    topo.addEventListener("pointerdown", function (ev) {
+      if (!flutuante()) return;
+      if (ev.target.closest && ev.target.closest("button")) return;
+      var r = painel.getBoundingClientRect();
+      drag.ativo = true;
+      drag.dx = ev.clientX - r.left;
+      drag.dy = ev.clientY - r.top;
+      painel.classList.add("arrastando");
+      try { topo.setPointerCapture(ev.pointerId); } catch (e) {}
+      ev.preventDefault();
+    });
+
+    document.addEventListener("pointermove", function (ev) {
+      if (!drag.ativo) return;
+      var x = ev.clientX - drag.dx;
+      var y = ev.clientY - drag.dy;
+      x = Math.max(0, Math.min(x, window.innerWidth - painel.offsetWidth));
+      y = Math.max(0, Math.min(y, window.innerHeight - painel.offsetHeight));
+      painel.style.left = x + "px";
+      painel.style.top = y + "px";
+    });
+
+    function fimDrag() {
+      drag.ativo = false;
+      painel.classList.remove("arrastando");
+    }
+    document.addEventListener("pointerup", fimDrag);
+    document.addEventListener("pointercancel", fimDrag);
+  }
+
+  /* --- mantém dentro da tela ao redimensionar --- */
+
+  window.addEventListener("resize", function () {
+    if (!flutuante()) return;
+    var maxX = window.innerWidth - painel.offsetWidth;
+    var maxY = window.innerHeight - painel.offsetHeight;
+    var x = parseFloat(painel.style.left) || 0;
+    var y = parseFloat(painel.style.top) || 0;
+    if (x > maxX) painel.style.left = Math.max(0, maxX) + "px";
+    if (y > maxY) painel.style.top = Math.max(0, maxY) + "px";
+  });
+})();

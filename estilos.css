@@ -244,3 +244,459 @@ textarea { resize: vertical; }
   .navegacao { flex-direction: column; }
   .quadro { order: 3; }
 }
+
+/* =========================================================
+   RASCUNHO — área de desenho por questão
+   ========================================================= */
+
+:root {
+  --r-papel: #f7f2e8;
+  --r-grade: rgba(0, 0, 0, 0.07);
+  --r-fundo: rgba(0, 0, 0, 0.03);
+  --r-borda: rgba(0, 0, 0, 0.1);
+  --r-texto: #3a3630;
+  --r-ativo-fg: #f7f2e8;
+}
+
+[data-tema="escuro"] {
+  --r-fundo: rgba(255, 255, 255, 0.05);
+  --r-borda: rgba(255, 255, 255, 0.1);
+  --r-texto: #d4cfc6;
+  --r-ativo-fg: #262220;
+}
+
+.rascunho-wrap {
+  margin: 16px 0;
+}
+
+.rascunho-barra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+#btn-rascunho {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+#btn-rascunho.ativa {
+  background: var(--r-texto);
+  color: var(--r-ativo-fg);
+  border-color: var(--r-texto);
+}
+
+.rascunho-indicador {
+  font-size: 0.82rem;
+  opacity: 0.55;
+}
+
+.rascunho-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* --- barra de ferramentas --- */
+
+.ferramentas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--r-borda);
+  border-radius: 10px;
+  background: var(--r-fundo);
+}
+
+.ferr-grupo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ferr-divisor {
+  width: 1px;
+  height: 22px;
+  background: var(--r-borda);
+}
+
+/* cores */
+
+.ferr-cor {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  background: var(--c);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.ferr-cor:hover {
+  transform: scale(1.15);
+}
+
+.ferr-cor.ativa {
+  border-color: var(--r-texto);
+  transform: scale(1.15);
+}
+
+/* espessura */
+
+.ferr-tamanho {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--r-borda);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.ferr-tamanho .ponto {
+  border-radius: 50%;
+  background: var(--r-texto);
+  transition: background 0.15s ease;
+}
+
+.ferr-tamanho:hover {
+  background: var(--r-borda);
+}
+
+.ferr-tamanho.ativa {
+  background: var(--r-texto);
+  border-color: var(--r-texto);
+}
+
+.ferr-tamanho.ativa .ponto {
+  background: var(--r-ativo-fg);
+}
+
+/* botões de texto */
+
+.ferr-texto {
+  padding: 5px 12px;
+  border: 1px solid var(--r-borda);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--r-texto);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ferr-texto:hover {
+  background: var(--r-borda);
+}
+
+.ferr-texto.ativa {
+  background: var(--r-texto);
+  color: var(--r-ativo-fg);
+  border-color: var(--r-texto);
+}
+
+/* --- área do papel --- */
+
+.rascunho-area {
+  background-color: var(--r-papel);
+  background-image: radial-gradient(circle, var(--r-grade) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.07),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  max-width: 1000px;
+}
+
+#rascunho-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.rascunho-dica {
+  text-align: center;
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.5;
+}
+
+/* compactar no celular */
+
+@media (max-width: 480px) {
+  .ferr-cor {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ferr-tamanho {
+    width: 26px;
+    height: 26px;
+  }
+
+  .ferr-texto {
+    padding: 4px 8px;
+    font-size: 0.78rem;
+  }
+
+  .ferr-divisor {
+    height: 18px;
+  }
+}
+
+/* =========================================================
+   CALCULADORA SIMPLES — tela da prova
+   ========================================================= */
+
+.calc-wrap {
+  margin: 16px 0;
+}
+
+.calc-barra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+#btn-calc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+#btn-calc.ativa {
+  background: var(--r-texto);
+  color: var(--r-ativo-fg);
+  border-color: var(--r-texto);
+}
+
+.calc-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 340px;
+}
+
+.calc-tela {
+  background: #23211c;
+  color: #f2ede2;
+  border-radius: 12px;
+  padding: 12px 16px 14px;
+  text-align: right;
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.calc-sub {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 0.82rem;
+  opacity: 0.55;
+  min-height: 1.1em;
+  letter-spacing: 0.05em;
+}
+
+.calc-display {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 2rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+.calc-teclado {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.calc-tecla {
+  min-height: 46px;
+  border: 1px solid var(--r-borda);
+  border-radius: 10px;
+  background: var(--r-fundo);
+  color: var(--r-texto);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+  transition: background 0.12s ease, transform 0.06s ease, border-color 0.12s ease;
+}
+
+.calc-tecla:hover {
+  background: var(--r-borda);
+}
+
+.calc-tecla:active {
+  transform: translateY(1px);
+}
+
+.calc-tecla.op {
+  background: var(--r-texto);
+  color: var(--r-ativo-fg);
+  border-color: var(--r-texto);
+  font-size: 1.2rem;
+}
+
+.calc-tecla.op:hover {
+  background: var(--r-texto);
+  opacity: 0.88;
+}
+
+.calc-tecla.util {
+  font-size: 0.95rem;
+}
+
+.calc-tecla.zero {
+  grid-column: span 2;
+}
+
+.calc-tecla.igual {
+  grid-row: span 2;
+  font-size: 1.35rem;
+}
+
+.calc-dica {
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  opacity: 0.5;
+}
+
+@media (max-width: 480px) {
+  .calc-painel {
+    max-width: 100%;
+  }
+
+  .calc-tecla {
+    min-height: 42px;
+    font-size: 0.95rem;
+  }
+
+  .calc-display {
+    font-size: 1.65rem;
+  }
+}
+
+/* =========================================================
+   CORREÇÃO — faz o atributo hidden do HTML funcionar
+   mesmo com display:flex nos painéis
+   ========================================================= */
+
+.rascunho-painel[hidden],
+.calc-painel[hidden] {
+  display: none !important;
+}
+
+/* =========================================================
+   CALCULADORA — MODO FLUTUANTE (pop-out)
+   ========================================================= */
+
+/* --- barra: botão fixar ao lado do toggle --- */
+
+.calc-barra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- topo: alça de arrastar (só aparece flutuando) --- */
+
+.calc-topo {
+  display: none;
+}
+
+.calc-painel.flutuante .calc-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--r-borda);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.calc-painel.flutuante.arrastando .calc-topo {
+  cursor: grabbing;
+}
+
+.calc-marca {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--r-texto);
+  opacity: 0.55;
+}
+
+.calc-topo-acoes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calc-icone-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--r-texto);
+  opacity: 0.65;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.calc-icone-btn:hover {
+  background: var(--r-borda);
+  opacity: 1;
+}
+
+/* --- painel flutuante --- */
+
+.calc-painel.flutuante {
+  position: fixed;
+  z-index: 130;
+  left: 0;
+  top: 0;
+  width: min(300px, 92vw);
+  background: rgba(55, 52, 52, 0.765);
+  border: 1px solid var(--r-borda);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+
+.calc-painel.flutuante .calc-dica {
+  display: none;
+}
